@@ -31,16 +31,20 @@ def get_or_initialize_token():
     return token
 
 # Función para autenticar el cliente
-def authenticate_client():
+async def authenticate_client():
     client = Client()  # Asegúrate de que la clase se llama con mayúscula
     token = get_or_initialize_token()
-    asyncio.run(client.authenticate_with_token(token))  # Este método debe ser correcto
+    try:
+        await client.authenticate_with_token(token)  # Esto debería ser await en un contexto async
+    except Exception as e:
+        print(f"Error autenticando el cliente: {str(e)}")
+        return None
     return client
 
 @app.route('/chat', methods=['POST'])
 def chat():
     try:
-        data = request.get_json(force=True)  # 'true' a 'True'
+        data = request.get_json(force=True)
         if not data:
             return jsonify({"error": "Invalid JSON"}), 400
 
@@ -54,11 +58,16 @@ def chat():
         chat = asyncio.run(client.create_or_continue_chat(character_id))
         answer = asyncio.run(chat.send_message(message))
 
+        if answer is None:
+            return jsonify({"error": "No response from chat"}), 500
+
         return jsonify({
             'name': answer.src_character_name,
             'text': answer.text
         })
-    except Exception as e:  # 'exception' a 'Exception'
+    except Exception as e:
+        # Cambié 'exception' a 'Exception' e imprime el error para mayor visibilidad
+        print(f"Error en el endpoint /chat: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
