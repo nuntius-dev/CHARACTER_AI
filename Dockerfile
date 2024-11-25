@@ -1,5 +1,5 @@
 # Imagen base
-FROM python:3.9-slim
+FROM python:3.10-slim
 
 # Configuración de entorno
 ENV PYTHONUNBUFFERED=1
