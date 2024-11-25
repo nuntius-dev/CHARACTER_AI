@@ -26,6 +26,6 @@ EXPOSE 5000 8501
 # Copiar el script para iniciar ambos servicios
 COPY start_services.sh /app/start_services.sh
 RUN chmod +x /app/start_services.sh
-
+RUN chmod +x start_services.sh
 # Comando para ejecutar los servicios
 CMD ["/app/start_services.sh"]
