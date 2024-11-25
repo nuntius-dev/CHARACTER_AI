@@ -9,16 +9,20 @@ TOKEN_FILE = './data/token.json'
 
 # Verificar o inicializar el token
 def get_or_initialize_token():
+    # Crear directorio si no existe
+    os.makedirs(os.path.dirname(TOKEN_FILE), exist_ok=True)
+
     if not os.path.exists(TOKEN_FILE):
+        # Solicitar el token solo si no existe
         token = input("Por favor, introduzca el token de autenticación: ")
-        os.makedirs(os.path.dirname(TOKEN_FILE), exist_ok=True)  # Crear directorio si no existe
         with open(TOKEN_FILE, 'w') as f:
             json.dump({"token": token}, f)
     else:
+        # Leer el token existente
         with open(TOKEN_FILE, 'r') as f:
             token_data = json.load(f)
             token = token_data.get("token")
-            if not token:
+            if not token:  # Si el archivo está vacío o inválido
                 token = input("Por favor, introduzca el token de autenticación: ")
                 with open(TOKEN_FILE, 'w') as f:
                     json.dump({"token": token}, f)
