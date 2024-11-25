@@ -39,6 +39,23 @@ def initialize():
 @app.route('/', methods=['GET'])
 def home():
     return "API Flask corriendo correctamente."
+@app.route('/chat', methods=['POST'])
+def chat():
+    try:
+        data = request.get_json()
+        character_id = data.get('character_id')
+        message = data.get('message')
+
+        if not character_id or not message:
+            return jsonify({'error': 'Faltan datos: character_id y mensaje son requeridos'}), 400
+
+        # Simular una respuesta
+        response_text = f"Recibí tu mensaje: '{message}' para el personaje con ID: {character_id}"
+
+        return jsonify({'text': response_text}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
