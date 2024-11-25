@@ -10,19 +10,18 @@ def get_answer_from_flask(character_id, message):
             json={"character_id": character_id, "message": message}
         )
         if response.status_code == 200:
-            return response.json().get('text', 'Sin respuesta')
+            return response.json().get('text')
         else:
-            return f"Error {response.status_code}: {response.json().get('error', 'Error desconocido')}"
+            return f"Error: {response.status_code} - {response.json().get('error')}"
     except Exception as e:
         return f"Error: {str(e)}"
 
-st.title('Chat Interactivo con Flask')
-st.write('Usa esta interfaz para interactuar con la API Flask.')
+st.header('ChatGPT Gratis GUI via Flask')
 
-# Input de usuario
-character_id = st.text_input('ID del Personaje:', 'eFF8HAxAEVRyZ8SQPNg5Mrl26EdecfekXyJ6NxZQJxM')
-question = st.text_area('Escribe tu pregunta aquí:')
+# Input de usuario para Character ID y mensaje
+character_id = st.text_input('Character ID:', 'eFF8HAxAEVRyZ8SQPNg5Mrl26EdecfekXyJ6NxZQJxM')
+question = st.text_area('Pregunta lo que quieras:')
 
-if st.button('Enviar'):
+if st.button('Preguntar'):
     answer = get_answer_from_flask(character_id, question)
-    st.write(f"**Respuesta:** {answer}")
+    st.markdown(f"**Respuesta:** {answer}")
