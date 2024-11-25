@@ -13,18 +13,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Copiar requirements e instalar dependencias de Python
-COPY requirements.txt .
+# Instalar dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar la aplicación al contenedor
-COPY . .
+# Crear el directorio persistente para el token
+RUN mkdir -p /app/data
 
-# Crear un volumen para persistencia del token
-VOLUME ["/app/data"]
-
-# Exponer puertos para Flask y Streamlit
+# Exponer los puertos para Flask y Streamlit
 EXPOSE 5000 8501
 
-# Comando para iniciar ambos servicios
+# Copiar el script para iniciar ambos servicios
+COPY start_services.sh /app/start_services.sh
+RUN chmod +x /app/start_services.sh
+
+# Comando para ejecutar los servicios
 CMD ["/app/start_services.sh"]
