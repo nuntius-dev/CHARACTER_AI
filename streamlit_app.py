@@ -1,39 +1,27 @@
-import asyncio
-from flask import Flask, request, jsonify
-from PyCharacterAI import Client
+import streamlit as st
+import requests
 
-app = Flask(__name__)
+flask_api_url = 'http://localhost:5000/chat'
 
-token = 'su token'  # Reemplaza con tu token de Character AI
-
-def authenticate_client():
-    client = Client()
-    asyncio.run(client.authenticate_with_token(token))
-    return client
-
-@app.route('/chat', methods=['POST'])
-def chat():
+def get_answer_from_flask(character_id, message):
     try:
-        data = request.get_json(force=True)
-        if not data:
-            return jsonify({"error": "Invalid JSON"}), 400
-
-        character_id = data.get('character_id')
-        message = data.get('message')
-
-        if not character_id or not message:
-            return jsonify({"error": "character_id and message are required"}), 400
-
-        client = authenticate_client()
-        chat = asyncio.run(client.create_or_continue_chat(character_id))
-        answer = asyncio.run(chat.send_message(message))
-
-        return jsonify({
-            'name': answer.src_character_name,
-            'text': answer.text
-        })
+        response = requests.post(
+            flask_api_url,
+            json={"character_id": character_id, "message": message}
+        )
+        if response.status_code == 200:
+            return response.json().get('text')
+        else:
+            return f"Error: {response.status_code} - {response.json().get('error')}"
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return f"Error: {str(e)}"
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+st.header('ChatGPT Gratis GUI via Flask')
+
+# Input de usuario para Character ID y mensaje
+character_id = st.text_input('Character ID:', 'eFF8HAxAEVRyZ8SQPNg5Mrl26EdecfekXyJ6NxZQJxM')
+question = st.text_area('Pregunta lo que quieras:')
+
+if st.button('Preguntar'):
+    answer = get_answer_from_flask(character_id, question)
+    st.markdown(f"**Respuesta:** {answer}")
