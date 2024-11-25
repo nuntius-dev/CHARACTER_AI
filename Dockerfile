@@ -27,4 +27,4 @@ VOLUME ["/app/data"]
 EXPOSE 5000 8501
 
 # Comando para iniciar ambos servicios
-CMD ["python", "app.py"]
+CMD ["/app/start_services.sh"]
