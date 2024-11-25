@@ -1,6 +1,6 @@
 import os
 import json
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request  # Asegúrate de incluir `request`
 
 app = Flask(__name__)
 
@@ -11,6 +11,7 @@ TOKEN_FILE = './data/token.json'
 def get_or_initialize_token():
     if not os.path.exists(TOKEN_FILE):
         token = input("Por favor, introduzca el token de autenticación: ")
+        os.makedirs(os.path.dirname(TOKEN_FILE), exist_ok=True)  # Crear directorio si no existe
         with open(TOKEN_FILE, 'w') as f:
             json.dump({"token": token}, f)
     else:
@@ -39,6 +40,7 @@ def initialize():
 @app.route('/', methods=['GET'])
 def home():
     return "API Flask corriendo correctamente."
+
 @app.route('/chat', methods=['POST'])
 def chat():
     try:
