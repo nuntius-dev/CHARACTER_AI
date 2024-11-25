@@ -12,9 +12,10 @@ def get_answer_from_flask(character_id, message):
         if response.status_code == 200:
             return response.json().get('text')
         else:
-            return f"Error: {response.status_code} - {response.json().get('error')}"
+            error_message = response.json().get('error') if response.content else "No response content"
+            return f"error: {response.status_code} - {error_message}"
     except Exception as e:
-        return f"Error: {str(e)}"
+        return f"error: {str(e)}"
 
 st.header('ChatGPT Gratis GUI via Flask')
 
