@@ -1,27 +1,28 @@
-import json
-import os
 import streamlit as st
+import requests
 
-# Ruta del archivo persistente
-TOKEN_FILE = './data/token.json'
+flask_api_url = 'http://localhost:5000/chat'
 
-# Leer el token
-def load_token():
-    if os.path.exists(TOKEN_FILE):
-        with open(TOKEN_FILE, 'r') as f:
-            return json.load(f).get("token")
-    return "Token no encontrado."
+def get_answer_from_flask(character_id, message):
+    try:
+        response = requests.post(
+            flask_api_url,
+            json={"character_id": character_id, "message": message}
+        )
+        if response.status_code == 200:
+            return response.json().get('text', 'Sin respuesta')
+        else:
+            return f"Error {response.status_code}: {response.json().get('error', 'Error desconocido')}"
+    except Exception as e:
+        return f"Error: {str(e)}"
 
-# Aplicación Streamlit
-st.title("Interfaz de Administración")
-st.write("Esta es una interfaz interactiva para administrar el token.")
+st.title('Chat Interactivo con Flask')
+st.write('Usa esta interfaz para interactuar con la API Flask.')
 
-token = load_token()
-st.text_input("Token actual:", token, disabled=True)
+# Input de usuario
+character_id = st.text_input('ID del Personaje:', 'eFF8HAxAEVRyZ8SQPNg5Mrl26EdecfekXyJ6NxZQJxM')
+question = st.text_area('Escribe tu pregunta aquí:')
 
-if st.button("Actualizar token"):
-    new_token = st.text_input("Ingrese un nuevo token:")
-    if new_token:
-        with open(TOKEN_FILE, 'w') as f:
-            json.dump({"token": new_token}, f)
-        st.success("Token actualizado correctamente.")
+if st.button('Enviar'):
+    answer = get_answer_from_flask(character_id, question)
+    st.write(f"**Respuesta:** {answer}")
